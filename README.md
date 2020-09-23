@@ -72,3 +72,9 @@ Search Student/Classes by available fields/associations
 http localhost:8080/api/v1/find/student/name/Camila
 http localhost:8080/api/v1/find/class/title/Calculo
 ```
+
+##Feedback
+
+Regarding of the validations, DropWizard has many tools to manage the request by user.
+
+I know you mention before you don't need this test using DB, but I have an alternative implementation with this approach <https://github.com/rodia/simple-scheduling>. That implementation is using `sqlite-jdbc-3.32.3.2` driver. Please take a lock at if you like.
