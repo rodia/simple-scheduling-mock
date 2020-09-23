@@ -44,7 +44,7 @@ public class ClassService {
 
     public int updateClass(Class attend) {
         try {
-            return this.classRepo.updateStudent(attend);
+            return this.classRepo.updateClass(attend);
         } catch (Exception exception) {
             exception.printStackTrace();
         }
@@ -54,7 +54,7 @@ public class ClassService {
 
     public int deleteClass(Class attend) {
         try {
-            return this.classRepo.deleteStudent(attend);
+            return this.classRepo.deleteClass(attend);
         } catch (Exception exception) {
             exception.printStackTrace();
         }

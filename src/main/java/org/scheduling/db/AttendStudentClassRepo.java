@@ -3,60 +3,65 @@ package org.scheduling.db;
 import org.scheduling.models.AttendStudentClass;
 import org.scheduling.models.Class;
 import org.scheduling.models.Student;
+import org.scheduling.services.ClassFacade;
+import org.scheduling.services.StudentFacade;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 
 public class AttendStudentClassRepo extends RepoAbstract {
-    public int addAssigned(AttendStudentClass attend) throws SQLException, ClassNotFoundException {
-        String query = "INSERT INTO attend (studentId, code, semester) VALUES (?, ?, ?)";
+    private final ArrayList<AttendStudentClass> assign;
 
-        try (Connection connection = this.getConnection()) {
-            try (PreparedStatement stmt = connection.prepareStatement(query)) {
-                stmt.setInt(1, attend.getStudentId());
-                stmt.setString(2, attend.getCode());
-                stmt.setString(3, attend.getSemester());
+    public AttendStudentClassRepo() {
+        this.assign = new ArrayList<>();
 
-                return stmt.executeUpdate();
-            }
+        try {
+            addAssigned(new AttendStudentClass(1, "1", "I-2020"));
+            addAssigned(new AttendStudentClass(1, "2", "I-2020"));
+            addAssigned(new AttendStudentClass(2, "1", "I-2020"));
+            addAssigned(new AttendStudentClass(2, "3", "I-2020"));
+            addAssigned(new AttendStudentClass(3, "1", "I-2020"));
+        } catch (Exception exception) {
+            exception.printStackTrace();
         }
+    }
+
+    public int addAssigned(AttendStudentClass attend) throws SQLException, ClassNotFoundException {
+        this.assign.add(attend);
+
+        return 1;
     }
 
     public int deleteAssigned(AttendStudentClass attend) throws SQLException, ClassNotFoundException {
-        String query = "DELETE FROM attend\n" +
-                "WHERE studentId = ? AND code = ? AND semester = ?";
+        int element = -1;
+        boolean find = false;
 
-        try (Connection connection = this.getConnection()) {
-            try (PreparedStatement stmt = connection.prepareStatement(query)) {
-                stmt.setInt(1, attend.getStudentId());
-                stmt.setString(2, attend.getCode());
-                stmt.setString(3, attend.getSemester());
-
-                return stmt.executeUpdate();
+        for (AttendStudentClass item : this.assign) {
+            element++;
+            if (attend.getCode().equals(item.getCode()) &&
+                    attend.getStudentId() == item.getStudentId() &&
+                    attend.getSemester().equals(item.getSemester())
+            ) {
+                find = true;
+                break;
             }
         }
+
+        if (find) {
+            this.assign.remove(element);
+            return 1;
+        }
+
+        return 0;
     }
 
     public Collection<Student> showStudentAssignedToClass(String code) throws SQLException, ClassNotFoundException {
-        String query = "SELECT * FROM student INNER JOIN attend ON student.id = attend.studentId WHERE attend.code = ?";
         ArrayList<Student> students = new ArrayList<>();
 
-        try (Connection connection = getConnection()) {
-            try (PreparedStatement stmt = connection.prepareStatement(query)) {
-                stmt.setString(1, code);
-                try (ResultSet rs = stmt.executeQuery()) {
-                    while (rs.next()) {
-                        students.add(new Student(
-                                rs.getInt("id"),
-                                rs.getString("lastname"),
-                                rs.getString("firstname")
-                        ));
-                    }
-                }
+        for (AttendStudentClass item: this.assign) {
+            if (code.equals(item.getCode())) {
+                students.add(StudentFacade.INSTANCE.getStudentService().getStudentById(item.getStudentId()));
             }
         }
 
@@ -64,24 +69,14 @@ public class AttendStudentClassRepo extends RepoAbstract {
     }
 
     public Collection<Class> showClassAssignedToStudent(int id) throws SQLException, ClassNotFoundException {
-        String query = "SELECT * FROM class INNER JOIN attend ON class.code = attend.code WHERE attend.studentId = ?";
-        ArrayList<Class> students = new ArrayList<>();
+        ArrayList<Class> classes = new ArrayList<>();
 
-        try (Connection connection = getConnection()) {
-            try (PreparedStatement stmt = connection.prepareStatement(query)) {
-                stmt.setInt(1, id);
-                try (ResultSet rs = stmt.executeQuery()) {
-                    while (rs.next()) {
-                        students.add(new Class(
-                                rs.getString("code"),
-                                rs.getString("title"),
-                                rs.getString("description")
-                        ));
-                    }
-                }
+        for (AttendStudentClass item: this.assign) {
+            if (id == item.getStudentId()) {
+                classes.add(ClassFacade.INSTANCE.getClassService().getClassByCode(item.getCode()));
             }
         }
 
-        return students;
+        return classes;
     }
 }

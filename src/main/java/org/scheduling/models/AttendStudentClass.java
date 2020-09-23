@@ -10,6 +10,12 @@ public class AttendStudentClass {
     public AttendStudentClass() {
     }
 
+    public AttendStudentClass(int studentId, String code, String semester) {
+        this.studentId = studentId;
+        this.code = code;
+        this.semester = semester;
+    }
+
     @JsonProperty
     public int getStudentId() {
         return studentId;

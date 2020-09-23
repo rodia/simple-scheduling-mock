@@ -2,98 +2,64 @@ package org.scheduling.db;
 
 import org.scheduling.models.Class;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 public class ClassRepo extends RepoAbstract {
+    private final Map<String, Class> classes;
+
+    public ClassRepo() {
+        this.classes = new HashMap<>();
+
+        try {
+            addClass(new Class("1", "Calculo", "Curso de Calculo"));
+            addClass(new Class("2", "Algebra", "Curso de ..."));
+            addClass(new Class("3", "Geometria", "Curso de ..."));
+            addClass(new Class("4", "Lenguaje", "Curso de ..."));
+            addClass(new Class("5", "Programación", "Curso de ..."));
+        } catch (Exception exception) {
+            exception.printStackTrace();
+        }
+    }
 
     public Collection<Class> getClasses() throws SQLException, ClassNotFoundException {
-        String query = "SELECT * FROM class";
-        ArrayList<Class> classes = new ArrayList<>();
-
-        try (Connection connection = getConnection()) {
-            try (PreparedStatement stmt = connection.prepareStatement(query)) {
-                try (ResultSet rs = stmt.executeQuery()) {
-                    while (rs.next()) {
-                        classes.add(new Class(
-                                rs.getString("code"),
-                                rs.getString("title"),
-                                rs.getString("description")
-                        ));
-                    }
-                }
-            }
-        }
-
-        return classes;
+        return classes.values();
     }
 
     public int addClass(Class attend) throws SQLException, ClassNotFoundException {
-        String query = "INSERT INTO class (code, title, description) VALUES (?, ?, ?)";
+        this.classes.put(attend.getCode(), attend);
 
-        try (Connection connection = this.getConnection()) {
-            try (PreparedStatement stmt = connection.prepareStatement(query)) {
-                stmt.setString(1, attend.getCode());
-                stmt.setString(2, attend.getTitle());
-                stmt.setString(3, attend.getDescription());
-
-                return stmt.executeUpdate();
-            }
-        }
+        return 1;
     }
 
     public Class getClassByCode(String code) throws SQLException, ClassNotFoundException {
-        String query = "SELECT * FROM class WHERE code = ?";
-
-        try (Connection connection = getConnection()) {
-            try (PreparedStatement stmt = connection.prepareStatement(query)) {
-                stmt.setString(1, code);
-                try (ResultSet rs = stmt.executeQuery()) {
-                    if (rs.next()) {
-                        return new Class(
-                                rs.getString("code"),
-                                rs.getString("title"),
-                                rs.getString("description")
-                        );
-                    }
-                }
-            }
-        }
-
-        return null;
+        return this.classes.get(code);
     }
 
-    public int updateStudent(Class attend) throws SQLException, ClassNotFoundException {
-        String query = "UPDATE class\n" +
-                "SET title = ?\n" +
-                ", description = ?\n" +
-                "WHERE code = ?";
+    public int updateClass(Class attend) throws SQLException, ClassNotFoundException {
+        Class class1 = this.classes.get(attend.getCode());
 
-        try (Connection connection = this.getConnection()) {
-            try (PreparedStatement stmt = connection.prepareStatement(query)) {
-                stmt.setString(1, attend.getTitle());
-                stmt.setString(2, attend.getDescription());
-                stmt.setString(3, attend.getCode());
-
-                return stmt.executeUpdate();
-            }
+        if (class1 == null) {
+            return 0;
         }
+
+        this.classes.remove(attend.getCode());
+        this.classes.put(attend.getCode(), attend);
+
+        return 1;
     }
 
-    public int deleteStudent(Class attend) throws SQLException, ClassNotFoundException {
-        String query = "DELETE FROM class\n" +
-                "WHERE code = ?";
+    public int deleteClass(Class attend) throws SQLException, ClassNotFoundException {
+        Class class1 = this.classes.get(attend.getCode());
 
-        try (Connection connection = this.getConnection()) {
-            try (PreparedStatement stmt = connection.prepareStatement(query)) {
-                stmt.setString(1, attend.getCode());
-
-                return stmt.executeUpdate();
-            }
+        if (class1 == null) {
+            return 0;
         }
+
+        this.classes.remove(attend.getCode());
+
+        return 1;
     }
 }
