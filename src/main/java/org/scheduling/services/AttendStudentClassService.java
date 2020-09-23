@@ -53,4 +53,24 @@ public class AttendStudentClassService {
 
         return null;
     }
+
+    public Collection<Student> findStudentByName(String name) {
+        try {
+            return this.attendStudentClassRepo.findStudentByName(name);
+        } catch (Exception exception) {
+            exception.printStackTrace();
+        }
+
+        return null;
+    }
+
+    public Collection<Class> findClassByTitle(String title) {
+        try {
+            return this.attendStudentClassRepo.findClassByTitle(title);
+        } catch (Exception exception) {
+            exception.printStackTrace();
+        }
+
+        return null;
+    }
 }

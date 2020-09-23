@@ -79,4 +79,30 @@ public class AttendStudentClassRepo extends RepoAbstract {
 
         return classes;
     }
+
+    public Collection<Student> findStudentByName(String name) throws SQLException, ClassNotFoundException {
+        ArrayList<Student> students = new ArrayList<>();
+        Collection<Student> studentCollection = StudentFacade.INSTANCE.getStudentService().getStudents();
+
+        for (Student item: studentCollection) {
+            if (item.getLastname().equals(name) || item.getFirstname().equals(name)) {
+                students.add(item);
+            }
+        }
+
+        return students;
+    }
+
+    public Collection<Class> findClassByTitle(String title) throws SQLException, ClassNotFoundException {
+        ArrayList<Class> classes = new ArrayList<>();
+        Collection<Class> classCollection = ClassFacade.INSTANCE.getClassService().getClasses();
+
+        for(Class item: classCollection) {
+            if (item.getTitle().equals(title)) {
+                classes.add(item);
+            }
+        }
+
+        return classes;
+    }
 }
