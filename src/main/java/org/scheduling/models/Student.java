@@ -7,6 +7,8 @@ public class Student {
     private String lastname;
     private String firstname;
 
+    public Student() {}
+
     public Student(int studentId, String lastname, String firstname) {
         this.studentId = studentId;
         this.lastname = lastname;

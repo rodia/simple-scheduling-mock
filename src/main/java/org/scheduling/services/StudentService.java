@@ -3,6 +3,7 @@ package org.scheduling.services;
 import org.scheduling.db.StudentRepo;
 import org.scheduling.models.Student;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 public class StudentService {
@@ -13,14 +14,50 @@ public class StudentService {
     }
 
     public Collection<Student> getStudents() {
-        return this.studentRepo.getStudents();
+        try {
+            return this.studentRepo.getStudents();
+        } catch (Exception exception) {
+            exception.printStackTrace();
+        }
+
+        return new ArrayList<Student>();
     }
 
     public void addStudent(Student student) {
-        this.studentRepo.addStudent(student);
+        try {
+            this.studentRepo.addStudent(student);
+        } catch (Exception exception) {
+            exception.printStackTrace();
+        }
     }
 
     public Student getStudentById(int id) {
-        return this.studentRepo.getStudentById(id);
+        try {
+            return this.studentRepo.getStudentById(id);
+        } catch (Exception exception) {
+            exception.printStackTrace();
+        }
+
+        return null;
+    }
+
+    public int updateStudent(Student student) {
+        try {
+            return this.studentRepo.updateStudent(student);
+        } catch (Exception exception) {
+            exception.printStackTrace();
+        }
+
+        return 0;
+    }
+
+    public int deleteStudent(Student student) {
+        try {
+            return this.studentRepo.deleteStudent(student);
+        } catch (Exception exception) {
+            exception.printStackTrace();
+        }
+
+        return 0;
     }
 }

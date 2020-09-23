@@ -1,38 +1,109 @@
 package org.scheduling.db;
 
 import org.scheduling.models.Student;
-
+import java.sql.*;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-public class StudentRepo {
-    private final Map<Integer, Student> students;
+public class StudentRepo extends RepoAbstract {
 
-    public StudentRepo(Map<Integer, Student> students) {
-        this.students = students;
+    public void addStudent(Student student) throws SQLException, ClassNotFoundException {
+        String query = "INSERT INTO Student (id, lastname, firstname) VALUES (?, ?, ?)";
+
+        try (Connection connection = this.getConnection()) {
+            try (PreparedStatement stmt = connection.prepareStatement(query)) {
+                stmt.setInt(1, student.getStudentId());
+                stmt.setString(2, student.getLastname());
+                stmt.setString(3, student.getFirstname());
+
+                int n = stmt.executeUpdate();
+            }
+        }
     }
 
-    public StudentRepo() {
-        this.students = new HashMap<>();
+    public Student getStudentById(int id) throws SQLException, ClassNotFoundException {
+        String query = "SELECT * FROM student WHERE id = ?";
 
-        addStudent(new Student(1, "Roberto", "Gomez"));
-        addStudent(new Student(2, "Roberto1", "Gomez1"));
-        addStudent(new Student(3, "Roberto2", "Gomez2"));
-        addStudent(new Student(4, "Roberto3", "Gomez3"));
-        addStudent(new Student(5, "Roberto4", "Gomez4"));
-        addStudent(new Student(6, "Roberto5", "Gomez5"));
+        try (Connection connection = getConnection()) {
+            try (PreparedStatement stmt = connection.prepareStatement(query)) {
+                stmt.setInt(1, id);
+                try (ResultSet rs = stmt.executeQuery()) {
+                    if (rs.next()) {
+                        return new Student(
+                                rs.getInt("id"),
+                                rs.getString("lastname"),
+                                rs.getString("firstname")
+                        );
+                    }
+                }
+            }
+        }
+
+        return null;
     }
 
-    public void addStudent(Student student) {
-        this.students.put(student.getStudentId(), student);
+    public Collection<Student> getStudents() throws SQLException, ClassNotFoundException {
+        String query = "SELECT * FROM student";
+        Map<Integer, Student> students = new HashMap<>();
+
+        try (Connection connection = getConnection()) {
+            try (PreparedStatement stmt = connection.prepareStatement(query)) {
+                try (ResultSet rs = stmt.executeQuery()) {
+                    while (rs.next()) {
+                         students.put(rs.getInt("id"), new Student(
+                                rs.getInt("id"),
+                                rs.getString("lastname"),
+                                rs.getString("firstname")
+                        ));
+                    }
+                }
+            }
+        }
+
+        return students.values();
     }
 
-    public Student getStudentById(int id) {
-        return students.get(id);
+    public int updateStudent(Student student) throws SQLException, ClassNotFoundException {
+        String query = "UPDATE student\n" +
+                "SET lastname = ?\n" +
+                ", firstname = ?\n" +
+                "WHERE id = ?";
+
+        try (Connection connection = this.getConnection()) {
+            try (PreparedStatement stmt = connection.prepareStatement(query)) {
+                stmt.setString(1, student.getLastname());
+                stmt.setString(2, student.getFirstname());
+                stmt.setInt(3, student.getStudentId());
+
+                return stmt.executeUpdate();
+            }
+        }
     }
 
-    public Collection<Student> getStudents() {
-        return this.students.values();
+    public int deleteStudent(Student student) throws SQLException, ClassNotFoundException {
+        String query = "DELETE FROM student\n" +
+                "WHERE id = ?";
+
+        try (Connection connection = this.getConnection()) {
+            try (PreparedStatement stmt = connection.prepareStatement(query)) {
+                stmt.setInt(1, student.getStudentId());
+
+                return stmt.executeUpdate();
+            }
+        }
+    }
+
+    public int deleteStudent(int id) throws SQLException, ClassNotFoundException {
+        String query = "DELETE FROM student\n" +
+                "WHERE id = ?";
+
+        try (Connection connection = this.getConnection()) {
+            try (PreparedStatement stmt = connection.prepareStatement(query)) {
+                stmt.setInt(1, id);
+
+                return stmt.executeUpdate();
+            }
+        }
     }
 }

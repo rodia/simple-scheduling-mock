@@ -34,4 +34,22 @@ public class StudentController {
 
         return Response.ok(student).build();
     }
+
+    @PUT
+    public Response updateStudent(Student student) {
+        if (StudentFacade.INSTANCE.getStudentService().updateStudent(student) > 0) {
+            return Response.ok().build();
+        }
+
+        return Response.status(Response.Status.NOT_FOUND).build();
+    }
+
+    @DELETE
+    public Response deleteStudent(Student student) {
+        if (StudentFacade.INSTANCE.getStudentService().deleteStudent(student) > 0) {
+            return Response.ok().build();
+        }
+
+        return Response.status(Response.Status.NOT_FOUND).build();
+    }
 }
