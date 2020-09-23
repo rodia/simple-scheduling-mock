@@ -3,7 +3,9 @@ package org.scheduling;
 import io.dropwizard.Application;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
+import org.scheduling.resources.AssignedController;
 import org.scheduling.resources.ClassController;
+import org.scheduling.resources.FindController;
 import org.scheduling.resources.StudentController;
 
 public class SchedulingApplication extends Application<SchedulingConfiguration> {
@@ -27,5 +29,7 @@ public class SchedulingApplication extends Application<SchedulingConfiguration> 
                     final Environment environment) {
         environment.jersey().register(new StudentController());
         environment.jersey().register(new ClassController());
+        environment.jersey().register(new AssignedController());
+        environment.jersey().register(new FindController());
     }
 }
