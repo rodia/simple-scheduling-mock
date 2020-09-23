@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 public class StudentService {
-    private StudentRepo studentRepo;
+    private final StudentRepo studentRepo;
 
     public StudentService() {
         this.studentRepo = new StudentRepo();
